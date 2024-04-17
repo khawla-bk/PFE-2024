@@ -20,11 +20,11 @@ class CylinderWidget(QWidget):
         painter.setRenderHint(QPainter.Antialiasing)
 
         # Set background color to white
-        painter.setBrush(QColor(255, 255, 255))
+        painter.setBrush(QColor(4, 12, 36))
         painter.drawRect(0, 0, self.width(), self.height())
 
         # Set color of the tank
-        tank_color = QColor(176, 176, 176)  # Light gray color
+        tank_color = QColor(165, 165, 165)  # Light gray color
         painter.setBrush(tank_color)
         pen = QPen(tank_color, 2)  # Black color, pen width 2
         painter.setPen(pen)
@@ -76,7 +76,7 @@ class CylinderWidget(QWidget):
         # Draw tank level labels
         font = QFont("Arial", 15)
         painter.setFont(font)
-        painter.setPen(QPen(QColor(0,0,0), 8))
+        painter.setPen(QPen(QColor(194,221,228), 8))
         painter.drawText(level_x + 8, tank_y + tank_height + 15, "0%")  # 0% label
         painter.drawText(level_x + 8, tank_y - 5, "100%")  # 100% label
 
