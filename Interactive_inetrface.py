@@ -2,7 +2,7 @@ import sys
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QLineEdit, QComboBox
 )
-from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QIcon, QPalette
+from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QIcon
 from PyQt5.QtCore import QRect, QSize, Qt, QTimer
 from sensor_simulation import get_pressure
 
@@ -49,9 +49,10 @@ class CylinderWidget(QWidget):
 
         self.parameter_btn = QPushButton("Configure")
         self.parameter_btn.setStyleSheet("background-color: #C2DDE4; color: #040C24;")
+        self.parameter_btn.setStyleSheet("font-size: 15px;padding: 5px; color: #111212")
         self.parameter_btn.setIcon(QIcon('parameter.png'))
         self.parameter_btn.setIconSize(QSize(40, 40))
-        self.parameter_btn.setFixedSize(100, 50)
+        self.parameter_btn.setFixedSize(120, 50)
         self.parameter_btn.clicked.connect(self.showSettings)
         self.button_layout.addWidget(self.parameter_btn, alignment=Qt.AlignCenter)
 
@@ -112,7 +113,7 @@ class TankDisplayWidget(QWidget):
         painter = QPainter(self)
         painter.setRenderHint(QPainter.Antialiasing)
 
-        # Set background color to white
+        # Set background color to blue
         painter.setBrush(QColor(4, 12, 36))
         painter.drawRect(0, 0, self.width(), self.height())
 
@@ -190,7 +191,7 @@ class TankDisplayWidget(QWidget):
         if self.cylinder_widget.liquid_type == "Essence Sans Plomb":
             painter.drawText(tank_x + 10, tank_y + tank_height + 60, self.cylinder_widget.liquid_type)
         elif self.cylinder_widget.liquid_type == "LPG":
-            painter.drawText(tank_x + 80, tank_y + tank_height + 60, self.cylinder_widget.liquid_type)
+            painter.drawText(tank_x + 90, tank_y + tank_height + 60, self.cylinder_widget.liquid_type)
         elif self.cylinder_widget.liquid_type == "Gasoil 50":
             painter.drawText(tank_x + 60, tank_y + tank_height + 60, self.cylinder_widget.liquid_type)
         else:
@@ -271,6 +272,7 @@ class SettingsWidget(QWidget):
         super().__init__()
         self.cylinder_widget = parent_widget  # Store the parent widget (CylinderWidget)
         self.setWindowTitle("Settings")
+        #self.setStyleSheet("background-color: #a5a5a5")
         self.setWindowIcon(QIcon('IrWise.png')) 
         self.setGeometry(100, 100, 400, 300)
         self.initUI()
@@ -281,7 +283,8 @@ class SettingsWidget(QWidget):
         self.name_input = QLineEdit()
         self.name_input.setText(str(self.cylinder_widget.tank_name))
         self.layout.addSpacing(10)
-        self.layout.addWidget(QLabel("Tank Name"))
+        self.layout.addWidget(self.createLabel("Tank Name"))
+        self.name_input.setStyleSheet("color: #000000; font-size: 10pt; font-family: Arial, sans-serif;")
         self.layout.addWidget(self.name_input)
 
         self.density_input = QComboBox()
@@ -289,39 +292,42 @@ class SettingsWidget(QWidget):
         self.density_input.addItem("Gasoil (Diesel)", 0.85)
         self.density_input.addItem("Gasoil 50", 0.85)
         self.density_input.addItem("LPG", 0.51)
-        #self.density_input.setCurrentIndex(0)
         self.setDensityValue(self.cylinder_widget.density)  # Set initial selection
         self.layout.addSpacing(10)
-        self.layout.addWidget(QLabel("Select Liquid Type"))
+        self.layout.addWidget(self.createLabel("Select Liquid Type"))
+        self.density_input.setStyleSheet("color: #000000; font-size: 10pt; font-family: Arial, sans-serif;")
         self.layout.addWidget(self.density_input)
 
         self.radius_input = QLineEdit()
         self.radius_input.setText(str(self.cylinder_widget.radius))
         self.layout.addSpacing(10)
-        self.layout.addWidget(QLabel("Tank Radius (m)"))
+        self.layout.addWidget(self.createLabel("Tank Radius (m)"))
+        self.radius_input.setStyleSheet("color: #000000; font-size: 10pt; font-family: Arial, sans-serif;")
         self.layout.addWidget(self.radius_input)
 
         self.height_input = QLineEdit()
         self.height_input.setText(str(self.cylinder_widget.height))
         self.layout.addSpacing(10)
-        self.layout.addWidget(QLabel("Tank Height (m)"))
+        self.layout.addWidget(self.createLabel("Tank Height (m)"))
+        self.height_input.setStyleSheet("color: #000000; font-size: 10pt; font-family: Arial, sans-serif;")
         self.layout.addWidget(self.height_input)
 
         self.save_button = QPushButton("Save")
         self.save_button.clicked.connect(self.saveSettings)
         self.layout.addWidget(self.save_button)
+
+        self.setLayout(self.layout)
+
+    def createLabel(self, text):
+        label = QLabel(text)
+        label.setStyleSheet("color: #000000; font-size: 11pt; font-family: Arial, sans-serif;")
+        return label
         
     def setDensityValue(self, density):
         # Set the current index of the QComboBox based on density value
         index = self.density_input.findData(density)
         if index != -1:
             self.density_input.setCurrentIndex(index)
-
-        #self.setLayout(self.layout)
-        #self.update_btn = QPushButton("Update")
-        #self.update_btn.clicked.connect(self.updateSettings)
-        #self.layout.addWidget(self.update_btn)
-
         self.setLayout(self.layout)
 
     def saveSettings(self):
@@ -343,7 +349,6 @@ class SettingsWidget(QWidget):
             self.cylinder_widget.radius = float(self.radius_input.text())
             self.cylinder_widget.updateCalculations()
         except ValueError:
-            # Handle invalid input gracefully
             pass
 
 if __name__ == '__main__':
