@@ -1,4 +1,4 @@
-mport spidev
+import spidev
 
 class LTC1859:
     def __init__(self, bus=0, device=0, max_speed_hz=1000000, mode=0b00):
