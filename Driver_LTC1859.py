@@ -6,6 +6,7 @@ class LTC1859:
     def __init__(self, bus=0, device=0, max_speed_hz=1000000, mode=0b00,convst=16):
         """
         Initialisation du bus SPI et des paramètres de l'ADC LTC1859
+        params:
         :param bus: Numéro du bus SPI
         :param device: Numéro du périphérique SPI
         :param max_speed_hz: Vitesse maximale du bus SPI en Hz
