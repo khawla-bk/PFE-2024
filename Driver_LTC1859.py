@@ -1,7 +1,9 @@
 import spidev
+import RPi.GPIO as IO
+import time
 
 class LTC1859:
-    def __init__(self, bus=0, device=0, max_speed_hz=1000000, mode=0b00):
+    def __init__(self, bus=0, device=0, max_speed_hz=1000000, mode=0b00,convst=16):
         """
         Initialisation du bus SPI et des paramètres de l'ADC LTC1859
         :param bus: Numéro du bus SPI
@@ -13,6 +15,10 @@ class LTC1859:
         self.spi.open(bus, device)
         self.spi.max_speed_hz = max_speed_hz
         self.spi.mode = mode
+        self.convst=convst
+        IO.setmode(IO.BOARD)
+        IO.setwarnings(False)
+        IO.setup(self.convst,IO.OUT,initial=IO.LOW)
 
     def read_channel(self, channel):
         """
@@ -21,16 +27,26 @@ class LTC1859:
         :return: Valeur numérique lue depuis le canal ADC
         """
         if not (0 <= channel <= 7):
-            raise ValueError("Channel must be between 0 and 7.")
+            raise valueError("Channel must be between 0 and 7.")
+        command= 0x8000 | (channel << 11)
+        IO.output(self.convst,IO.HIGH)
+        time.sleep(0.001)
+        IO.output(self.convst,IO.LOW)
         # Envoyer la commande de lecture SPI et recevoir la réponse
-        adc = self.spi.xfer2([1, (8 + channel) << 4, 0])
+
+        self.spi.xfer2([(command >> 8) & 0xFF,command & 0xFF])
+        time.sleep(0.001)
+        adc = self.spi.xfer2([0x00,0x00])
+        print(f"réponse brute : {adc}")
+
         # Convertir les deux derniers octets en une valeur numérique
-        data = ((adc[1] & 3) << 8) + adc[2]
+        data = ((adc[0] & 0xFF) << 8) | (adc[1] & 0xFF)
         return data
 
     def close(self):
         # Fermer la connexion SPI
         self.spi.close()
+        IO.cleanup(self.convst)
 
 # Exemple d'utilisation de la classe LTC1859
 if __name__ == "__main__":
