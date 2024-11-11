@@ -1,5 +1,11 @@
 import time
 from AWSIoTPythonSDK.MQTTLib import AWSIoTMQTTClient
+import logging
+logger = logging.getLogger("AWSIoTPythonSDK.core")
+logger.setLevel(logging.DEBUG)
+streamHandler = logging.StreamHandler()
+logger.addHandler(streamHandler)
+
 
 def test(self,params,packet):
         print("Recieved message from AWS Iot Core")
