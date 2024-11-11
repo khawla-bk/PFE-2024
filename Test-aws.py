@@ -30,7 +30,7 @@ def main():
         message = "Hello from Rpi to AWS"
         mqtt_connection.publish(
                 topic="Raspberry-test",
-                payload= json.dump(message),
+                payload= json.dumps(message),
                 qos=mqtt.QoS.AT_LEAST_ONCE,
         )
         print("Published message to AWS IoT Core")
