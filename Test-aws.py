@@ -1,3 +1,4 @@
+import json
 import time
 from awsiot import mqtt_connection_builder
 from awscrt import io, mqtt, auth, http
@@ -19,20 +20,22 @@ mqtt_connection = mqtt_connection_builder.mtls_from_path(
         keep_alive_secs=6,
 )
 
-print("Connecting to AWS IoT...")
-connect_future = mqtt_connection.connect()
-connect_future.result()
-print("Connected!")
+def main():
+        print("Connecting to AWS IoT...")
+        connect_future = mqtt_connection.connect()
+        connect_future.result()
+        print("Connected!")
 
-# Publish a message
-mqtt_connection.publish(
-        topic="Raspberry-test",
-        payload="{'Message':'Hello From Rpi to AWS'}",
-        qos=mqtt.QoS.AT_LEAST_ONCE,
-)
-print("Published message to AWS IoT Core")
+        # Publish a message
+        message = "Hello from Rpi to AWS"
+        mqtt_connection.publish(
+                topic="Raspberry-test",
+                payload= json.dump(message),
+                qos=mqtt.QoS.AT_LEAST_ONCE,
+        )
+        print("Published message to AWS IoT Core")
 
-# Disconnect
-disconnect_future = mqtt_connection.disconnect()
-disconnect_future.result()
-print("Disconnected!")
+if __name__=="__main__":
+        while True:
+                main()
+                time.sleep(5)
