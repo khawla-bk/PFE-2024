@@ -29,7 +29,7 @@ class MainWindow(QWidget):
         super().__init__()
         self.setWindowTitle("Tank Level Monitoring System")
         self.setGeometry(250, 250, 300, 230)  # Set initial size
-        self.setWindowFlags(Qt.FramelessWindowHint)  # Enlever la barre en haut
+        # self.setWindowFlags(Qt.FramelessWindowHint)  # Enlever la barre en haut
         self.setWindowIcon(QIcon('IrWise.png'))
         self.initUI()
 
