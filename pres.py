@@ -1,13 +1,22 @@
+from decimal import Decimal
 import sys
+import time
 from PyQt5.QtWidgets import (
     QApplication, QWidget, QVBoxLayout, QPushButton, QHBoxLayout, QLabel, QSizePolicy, QSpacerItem, QGridLayout, QScrollArea, QLineEdit, QComboBox,  
     QFrame)
 from PyQt5.QtGui import QPainter, QColor, QPen, QFont, QIcon
 from PyQt5.QtCore import QRect, QSize, Qt, QTimer
 from sensors import Pressure # type: ignore
+import boto3
+
+# Initialize the DynamoDB client
+dynamodb = boto3.resource('dynamodb', region_name='eu-west-3')  
+
+# Define the table
+table = dynamodb.Table('Tanks')
 
 # Créez les objets Pressure pour chaque tank
-tank1 = Pressure(channel=0, values=list(range(20, 25)))
+tank1 = Pressure(channel=0, values=list(range(10, 40)))
 tank2 = Pressure(channel=1) 
 tank3 = Pressure(channel=2) 
 tank4 = Pressure(channel=3) 
@@ -154,7 +163,6 @@ class CylinderWidget(QWidget):
         if isinstance(self.pressure, list):
             self.pressure = self.pressure[0] if isinstance(self.pressure[0], (int, float)) else None
 
-        # Add a debug print statement to check the pressure value
         print(f"Debug - Current Pressure: {self.pressure}")
     
         if self.pressure is not None:
@@ -167,7 +175,6 @@ class CylinderWidget(QWidget):
                 tank_volume = area * self.height  # Assuming tank height is 3 meters
                 volume = area * height  # Calculate the volume of the liquid
 
-                # Add a debug print statement to check the volume and tank_volume
                 print(f"Debug - Calculated Volume: {volume}, Tank Volume: {tank_volume}")
 
                 if volume >= 0 and volume <= tank_volume:
@@ -176,6 +183,10 @@ class CylinderWidget(QWidget):
                     self.volume_label.setText(f"Volume: {self.volume:.2f} m³")
                     self.level_label.setText(f"Level: {self.tank_level * 100:.2f} %")
                     self.tank_display.update()  # Trigger repaint
+
+                    # Store updated data in DynamoDB
+                    self.store_data_in_dynamodb()
+
                 else:
                     print("Debug - Volume is out of expected range.")
             except ValueError:
@@ -184,7 +195,28 @@ class CylinderWidget(QWidget):
             # Handle the case where pressure is not a number
             self.volume_label.setText("No sensor connected")
             self.level_label.setText("Level: - %")
-                
+
+    def store_data_in_dynamodb(self):
+        # Convert float values to Decimal for DynamoDB
+        tank_number = self.pressure_obj.channel + 1  # Adjust to ensure Tank#1 is 0001, Tank#2 is 0002, etc.
+        sk_value = f"{tank_number:04d}"
+        data = {
+            "PK": "Tank#1",
+            "SK": sk_value,  # Use channel as unique identifier for SK
+            "TankNumber": tank_number,
+            "Value": Decimal(str(self.pressure)) if self.pressure is not None else Decimal("0.0"),
+            "Status": "Connected" if self.pressure is not None else "No Sensor Connected",
+            "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),  # Current timestamp in ISO 8601 format
+            "Volume": Decimal(str(round(self.volume, 2))) if self.volume is not None else Decimal("0.0"),
+            "TankLevelPercentage": Decimal(str(round(self.tank_level * 100, 2))) if self.tank_level is not None else Decimal("0.0")
+        }
+
+        # Insert data into DynamoDB
+        try:
+            response = table.put_item(Item=data)
+            print("Data stored successfully:", response)
+        except Exception as e:
+            print("Error storing data:", e)        
 
 class TankDisplayWidget(QWidget):
     def __init__(self, parent=None):
