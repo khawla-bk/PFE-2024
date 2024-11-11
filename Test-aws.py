@@ -22,8 +22,8 @@ myMQTTClient.configureConnectDisconnectTimeout(10) # 10 sec
 myMQTTClient.configureMQTTOperationTimeout(50) # 50 sec
 print ('Initiating connection...')
 myMQTTClient.connect()
-#myMQTTClient.subscribe("Raspberry-test",1,test)
-#while True:
-#       time.sleep(5)
-print("Publishing to AWS IoT Core")
-myMQTTClient.publish(topic="Raspberry-test",QoS=1,payload="{'Message':'Hello From Rpi to AWS'}")
+myMQTTClient.subscribe("Raspberry-test",1,test)
+while True:
+        time.sleep(5)
+        print("Publishing to AWS IoT Core")
+        myMQTTClient.publish(topic="Raspberry-test",QoS=1,payload="{'Message':'Hello From Rpi to AWS'}")
