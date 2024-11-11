@@ -1,41 +1,29 @@
-import json
-import time
-from awsiot import mqtt_connection_builder
-from awscrt import io, mqtt, auth, http
 
-# Define endpoint and cert paths
-endpoint = "a2w3ke0es02zef-ats.iot.eu-west-3.amazonaws.com"
-root_ca_path = "/home/gateway/Desktop/PFE-2024/Cert/root-CA.crt"
-cert_path = "/home/gateway/Desktop/PFE-2024/Cert/Raspberry_pi.cert.pem"
-key_path = "/home/gateway/Desktop/PFE-2024/Cert/Raspberry_pi.private.key"
+import boto3
 
-# Set up MQTT connection using the AWS IoT Device SDK v2
-mqtt_connection = mqtt_connection_builder.mtls_from_path(
-        endpoint=endpoint,
-        cert_filepath=cert_path,
-        pri_key_filepath=key_path,
-        ca_filepath=root_ca_path,
-        client_id="Raspberry_pi",
-        clean_session=False,
-        keep_alive_secs=6,
-)
+# Initialize the DynamoDB client
+dynamodb = boto3.resource('dynamodb', region_name='eu-west-3')  
 
-def main():
-        print("Connecting to AWS IoT...")
-        connect_future = mqtt_connection.connect()
-        connect_future.result()
-        print("Connected!")
+# Define the table
+table = dynamodb.Table('Tanks')
 
-        # Publish a message
-        message = "Hello from Rpi to AWS"
-        mqtt_connection.publish(
-                topic="Raspberry-test",
-                payload= json.dumps(message),
-                qos=mqtt.QoS.AT_LEAST_ONCE,
-        )
-        print("Published message to AWS IoT Core")
+# Function to store data
+def store_data(data):
+    try:
+        response = table.put_item(Item=data)
+        print("Data stored successfully:", response)
+    except Exception as e:
+        print("Error storing data:", e)
 
-if __name__=="__main__":
-        while True:
-                main()
-                time.sleep(5)
+# Example data to store for testing
+data = {
+    "PK": "Tank#1",
+    "SK": "0001",
+    "TankNumber": 1,
+    "Value": 45,
+    "Status": "Connected",
+    "timestamp": "2024-11-09T12:00:00Z"
+}
+
+# Store data
+store_data(data)
