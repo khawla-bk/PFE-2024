@@ -33,23 +33,18 @@ def connect_to_lte():
 def monitor_wifi_and_switch_to_lte():
     while True:
         if not is_wifi_connected():
-            print("WiFi connection lost. Switching to LTE...")
             connect_to_lte()
             time.sleep(10)
-        else:
-            print("WiFi is connected.")
-            # time.sleep(CHECK_INTERVAL)
-        time.sleep(60)  # 2 minutes = 120 seconds
-        print("WiFi connection is lost")
-        print("Switching to LTE Module")
+            print("WiFi connection is lost")
+            print("Switching to LTE Module")
         
-        # Simulate connecting to the LTE module
-        time.sleep(2)  # Short delay for LTE connection simulation
-        print("3G/4G LTE Module connected successfully")
+            # Simulate connecting to the LTE module
+            time.sleep(2)  # Short delay for LTE connection simulation
+            print("3G/4G LTE Module connected successfully")
 
 def main():
+    print("Starting script")
     while True:
-        print("Starting script")
         # Starting the WiFi monitoring in a separate thread
         monitor_thread = threading.Thread(target=monitor_wifi_and_switch_to_lte)
         monitor_thread.daemon = True
