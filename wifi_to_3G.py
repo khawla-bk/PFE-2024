@@ -32,8 +32,8 @@ def connect_to_lte():
 
 def monitor_wifi_and_switch_to_lte():
     while True:
-        if not is_wifi_connected():
-            connect_to_lte()
+        if is_wifi_connected():
+            # connect_to_lte()
             time.sleep(10)
             print("WiFi connection is lost")
             print("Switching to LTE Module")
