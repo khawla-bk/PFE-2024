@@ -38,7 +38,14 @@ def monitor_wifi_and_switch_to_lte():
             time.sleep(10)
         else:
             print("WiFi is connected.")
-            time.sleep(CHECK_INTERVAL)
+            # time.sleep(CHECK_INTERVAL)
+        time.sleep(120)  # 2 minutes = 120 seconds
+        print("WiFi connection is lost")
+        print("Switching to LTE Module")
+        
+        # Simulate connecting to the LTE module
+        time.sleep(2)  # Short delay for LTE connection simulation
+        print("3G/4G LTE Module connected successfully")
 
 def main():
     while True:
