@@ -39,7 +39,7 @@ def monitor_wifi_and_switch_to_lte():
         else:
             print("WiFi is connected.")
             # time.sleep(CHECK_INTERVAL)
-        time.sleep(120)  # 2 minutes = 120 seconds
+        time.sleep(60)  # 2 minutes = 120 seconds
         print("WiFi connection is lost")
         print("Switching to LTE Module")
         
@@ -54,7 +54,7 @@ def main():
         monitor_thread = threading.Thread(target=monitor_wifi_and_switch_to_lte)
         monitor_thread.daemon = True
         monitor_thread.start()
-        time.sleep(2)
+        time.sleep(5)
 
 if __name__ == '__main__':
     main()
