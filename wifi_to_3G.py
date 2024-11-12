@@ -7,7 +7,7 @@ def simulate_wifi_and_lte():
     while True:
         if wifi_connected:
             print("WiFi is connected")
-            time.sleep(10)  # Stay connected to WiFi for 10 seconds
+            time.sleep(15)  # Stay connected to WiFi for 10 seconds
             print("WiFi connection is lost")
             print("Switching to LTE Module")
             
@@ -22,7 +22,7 @@ def simulate_wifi_and_lte():
         else:
             print("WiFi connection established")
             wifi_connected = True
-            time.sleep(10)  # Stay connected to WiFi for another 10 seconds
+            time.sleep(15)  # Stay connected to WiFi for another 10 seconds
 
 def main():
     print("Starting script")
